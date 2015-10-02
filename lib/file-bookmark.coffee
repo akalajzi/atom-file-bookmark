@@ -11,6 +11,7 @@ class FileBookmark
 
   show: null
   currentPath: null
+  disabled: null
 
   MSG_ADDED: "File bookmarked"
   MSG_REMOVED: "File removed from bookmarks"
@@ -23,15 +24,16 @@ class FileBookmark
       @fileBookmarkView = atom.deserializers.deserialize state.fileBookmarkViewState
     else
       @fileBookmarkView = new FileBookmarkView()
-    @show = no
+    @show = @disabled = no
     @currentPath = @_getCurrentPath()
 
     @subscriptions = new CompositeDisposable
 
     # Register commands
-    @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:toggle': => @toggle()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:toggle-panel': => @toggle()
     @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:add': => @add()
     @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:remove': => @remove()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:toggle-bookmark': => @toggleBookmark()
     @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:toggle-shortcut-icons': => @toggleShortcutIcons()
     # tooltips
     @tooltipDelay = {
@@ -90,18 +92,27 @@ class FileBookmark
       @fileBookmarkView.fbIcons.classList.add 'hidden'
     atom.config.set 'file-bookmark.icons', showIcons
 
+  _hideShortcutIcons: =>
+    @fileBookmarkView.fbIcons.classList.remove 'hidden'
+    @fileBookmarkView.fbIcons.classList.add 'hidden'
+
+  _showShortcutIcons: =>
+    @fileBookmarkView.fbIcons.classList.remove 'hidden'
+
   toggleFileTree: ->
     # TODO: isPackageActive doing problems on non-dev instance?
     # if atom.packages.isPackageActive 'tree-view'
     atom.commands.dispatch atom.views.getView(atom.workspace), 'tree-view:toggle'
 
   toggleBookmark: ->
+    return if @disabled
     if @_checkIfBookmarked @currentPath
       @remove()
     else
       @add()
 
   add: ->
+    return if @disabled
     unless @_checkIfBookmarked @currentPath
       paths = @fileBookmarkView.getBookmarks()
       paths.push @currentPath
@@ -109,6 +120,7 @@ class FileBookmark
       @_postChangeRender()
 
   remove: ->
+    return if @disabled
     if @_checkIfBookmarked @currentPath
       paths = @fileBookmarkView.getBookmarks().filter (item) => item isnt @currentPath
       @fileBookmarkView.setBookmarks paths
@@ -138,7 +150,15 @@ class FileBookmark
   _getCurrentPath: -> @_getActiveEditor()?.getPath()
 
   _handleChangeActivePane: =>
-    # TODO: handle @_getActiveEditor()? (settings, search)
+    if @_getActiveEditor()?
+      @disabled = no
+      @_showShortcutIcons()
+    else
+      # prevent bookmarking
+      @disabled = yes
+      @_hideShortcutIcons()
+      return
+
     @currentPath = @_getCurrentPath()
     if @_pathExists @currentPath
       @_updateBookmarkIcon()
