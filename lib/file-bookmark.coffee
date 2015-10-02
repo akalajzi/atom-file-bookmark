@@ -91,8 +91,9 @@ class FileBookmark
     atom.config.set 'file-bookmark.icons', showIcons
 
   toggleFileTree: ->
-    if atom.packages.isPackageActive 'tree-view'
-      atom.commands.dispatch atom.views.getView(atom.workspace), 'tree-view:toggle'
+    # TODO: isPackageActive doing problems on non-dev instance?
+    # if atom.packages.isPackageActive 'tree-view'
+    atom.commands.dispatch atom.views.getView(atom.workspace), 'tree-view:toggle'
 
   toggleBookmark: ->
     if @_checkIfBookmarked @currentPath
