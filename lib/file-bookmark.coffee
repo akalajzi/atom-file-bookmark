@@ -19,7 +19,7 @@ class FileBookmark
   subscriptions: null
 
   activate: (state) ->
-    if (state)
+    if Object.keys(state).length
       @fileBookmarkView = atom.deserializers.deserialize state.fileBookmarkViewState
     else
       @fileBookmarkView = new FileBookmarkView()
