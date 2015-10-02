@@ -14,7 +14,7 @@
     "name": "AK",
     "email": "akalajzi@gmail.com"
   },
-  "repository": "https://github.com/atom/file-bookmark",
+  "repository": "https://github.com/akalajzi/atom-file-bookmark",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
