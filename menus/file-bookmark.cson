@@ -1,0 +1,23 @@
+# See https://atom.io/docs/latest/hacking-atom-package-word-count#menus for more details
+'menu': [
+  'label': 'Packages'
+  'submenu': [
+    'label': 'Bookmark files'
+    'submenu': [
+      { 'label': 'Add', 'command': 'file-bookmark:add' }
+      { 'label': 'Remove', 'command': 'file-bookmark:remove' }
+    ]
+  ]
+]
+
+'context-menu':
+  'atom-text-editor': [
+    {
+      'label': 'Bookmark file'
+      'command': 'file-bookmark:add'
+    }
+    {
+      'label': 'Remove bookmark'
+      'command': 'file-bookmark:remove'
+    }
+  ]

@@ -1,0 +1,204 @@
+// The ui-variables file is provided by base themes provided by Atom.
+//
+// See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
+// for a full listing of what's available.
+@import "ui-variables";
+
+.file-bookmark {
+  @button-margin-size: 2px;
+  @button-border-size: 1px;
+  background-color: @base-background-color;
+  border: 1px solid @base-border-color;
+  color: @text-color;
+  display: flex;
+  justify-content: flex-start;
+
+  button.file-bookmark-btn {
+    background-color: @base-background-color;
+    background-image: inherit;
+    border-color: @base-background-color;
+    cursor: pointer;
+    flex: 0 0 auto;
+    margin: @button-margin-size;
+    padding: 0;
+
+    &:before {
+      display: inline;
+    }
+    &:focus,
+    &:hover {
+      border-color: @button-border-color;
+      outline: none;
+    }
+  }
+
+  .title {
+    display: block;
+    font-size: 16px;
+    padding: 5px;
+  }
+
+  button.fb-clear-all-btn {
+    height: 22px;
+    line-height: 22px;
+    font-size: 10px;
+  }
+
+  .file-bookmark-list {
+    display: block;
+
+    .file-bookmark-item {
+      display: block;
+      padding: 5px 0px 0px 5px;
+
+      span.fb-relative-path {
+        display: block;
+        font-size: 10px;
+        padding-bottom: 3px;
+        color: @text-color-subtle;
+      }
+
+      span.fb-filename {
+        display: block;
+        font-size: 12px;
+        padding-left: 10px;
+        color: @text-color-highlight;
+        cursor: pointer;
+
+        &.fb-selected {
+          background-color: @background-color-selected;
+        }
+      }
+    }
+
+  }
+
+  &.file-bookmark-right {
+    border-bottom: 0 none;
+    border-right: 0 none;
+    border-top: 0 none;
+  }
+
+  &.file-bookmark-horizontal .file-bookmark-btn + .file-bookmark-btn {
+    margin-left: 0;
+  }
+  &.file-bookmark-vertical .file-bookmark-btn + .file-bookmark-btn {
+    margin-top: 0;
+  }
+
+  &.file-bookmark-horizontal .file-bookmark-spacer {
+    border: 0 none;
+    border-left: @button-border-size solid @button-background-color;
+    border-right: @button-border-size solid @button-border-color;
+    margin: @button-margin-size + 3 0;
+  }
+  &.file-bookmark-vertical .file-bookmark-spacer {
+    border: 0 none;
+    border-bottom: @button-border-size solid @button-background-color;
+    border-top: @button-border-size solid @button-border-color;
+    margin: 0 @button-margin-size + 3;
+  }
+
+  &.file-bookmark-16px {
+    .file-bookmark-size(16px * 2);
+  }
+  &.file-bookmark-24px {
+    .file-bookmark-size(24px * 2);
+  }
+  &.file-bookmark-32px {
+    .file-bookmark-size(32px * 2);
+  }
+  .file-bookmark-260px {
+    width: 260px;
+  }
+
+  .file-bookmark-size(@size) {
+    line-height: @size;
+
+    &.file-bookmark-horizontal {
+      flex-direction: row;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    &.file-bookmark-vertical {
+      flex-direction: column;
+      height: 100%;
+      overflow-x: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      &.gutter-top::before,
+      &.gutter-bottom::after {
+        content: "";
+        height: 100%;
+        left: 0;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1;
+      }
+      &.gutter-top::before {
+        box-shadow: inset 0px 20px 25px -20px rgb(0, 0, 0);
+      }
+      &.gutter-bottom::after {
+        box-shadow: inset 0px -20px 25px -20px rgb(0, 0, 0);
+      }
+    }
+
+    .file-bookmark-btn {
+      height: @size + (@button-border-size * 2);
+      width: @size + (@button-border-size * 2);
+      &:before {
+        font-size: @size / 2;
+        line-height: @size;
+      }
+    }
+
+    &.file-bookmark-horizontal .file-bookmark-spacer {
+      height: @size - 4;
+    }
+    &.file-bookmark-vertical .file-bookmark-spacer {
+      width: @size - 4;
+    }
+  }
+
+  .file-bookmark-icons {
+    position: absolute;
+    top: 40%;
+
+    &.panel-open { right: 270px; }
+    &.panel-closed { right: 20px; }
+
+    .fb-icon {
+      text-align: center;
+      padding-bottom: 5px;
+      float: left;
+      cursor: pointer;
+    }
+
+    .fb-file-not-bookmarked {
+      color: @text-color-subtle;
+    }
+    .fb-file-bookmarked {
+      color: @text-color-added;
+    }
+
+  }
+}
+
+.tab .status-bookmarked {
+  color: #41c4eb !important;
+}
+
+.status-bookmarked {
+  color: #41c4eb !important;
+}
+
+span.fb-icon.icon::before {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+}
