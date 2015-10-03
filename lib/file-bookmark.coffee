@@ -117,29 +117,20 @@ class FileBookmark
       paths = @fileBookmarkView.getBookmarks()
       paths.push @currentPath
       @fileBookmarkView.setBookmarks paths
-      @_postChangeRender()
+      @fileBookmarkView.redrawBookmarks @currentPath
 
   remove: ->
     return if @disabled
     if @_checkIfBookmarked @currentPath
       paths = @fileBookmarkView.getBookmarks().filter (item) => item isnt @currentPath
       @fileBookmarkView.setBookmarks paths
-      @_postChangeRender()
-
-  _postChangeRender: ->
-      @_updateListPanel()
-      @_updateBookmarkIcon()
-      @_highlightActiveFile()
+      @fileBookmarkView.redrawBookmarks @currentPath
 
   _checkIfBookmarked: (path) ->
-    exists = _.indexOf @fileBookmarkView.getBookmarks(), path
-    if exists < 0
-      return no
-    else
+    if path in @fileBookmarkView.getBookmarks()
       return yes
-
-  _updateListPanel: ->
-    @fileBookmarkView.renderItems()
+    else
+      return no
 
   _getEditors: -> atom.workspace.getTextEditors()
 
@@ -161,21 +152,13 @@ class FileBookmark
 
     @currentPath = @_getCurrentPath()
     if @_pathExists @currentPath
-      @_updateBookmarkIcon()
-      @_highlightActiveFile()
-
-  _highlightActiveFile: =>
-    $(".fb-filename").removeClass 'fb-selected'
-    $("[data-path=\"#{@currentPath}\"]").addClass 'fb-selected'
+      @fileBookmarkView.updateBookmarkIcon @currentPath
+      @fileBookmarkView.highlightActiveFile @currentPath
 
   _handleDependencies: ->
     if atom.packages.isPackageActive 'tree-view'
       $(@fileBookmarkView.element).on 'click', '.fb-tree-toggle', => @toggleFileTree()
     else
       $('.file-bookmark-tree-toggle-icon').addClass 'hidden'
-
-  _updateBookmarkIcon: ->
-    bookmarked = @_checkIfBookmarked @currentPath
-    @fileBookmarkView.updateBookmarkIcon bookmarked
 
 module.exports = new FileBookmark()

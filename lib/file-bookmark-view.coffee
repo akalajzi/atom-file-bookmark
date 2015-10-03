@@ -54,12 +54,13 @@ class FileBookmarkView
     bList = document.createElement 'div'
     bList.classList.add 'file-bookmark-list'
 
-    qNotes = document.createElement 'div'
-    qNotes.classList.add 'file-bookmark-notes'
+    # TODO: notes
+    # qNotes = document.createElement 'div'
+    # qNotes.classList.add 'file-bookmark-notes'
 
     @container.appendChild header
     @container.appendChild bList
-    @container.appendChild qNotes
+    # @container.appendChild qNotes
 
     @element.appendChild @container
     @element.appendChild @fbIcons
@@ -70,9 +71,11 @@ class FileBookmarkView
     self = this
 
     $(@element).on 'click', '.fb-filename', ->
-      atom.workspace.open(self._entryForElement(this))
+      atom.workspace.open (self._entryForElement(this))
     $(@element).on 'click', '.fb-clear-all-btn', =>
       @clearBookmarks()
+    $(@element).on 'click', '.file-bookmark-remove', ->
+      self.removeBookmark (self._entryForElement(this))
 
     @renderItems()
 
@@ -86,6 +89,7 @@ class FileBookmarkView
       itemT = "<div class='file-bookmark-item'>"
       itemT += "<span class='fb-relative-path icon icon-file-directory'>#{path}</span>"
       for file in files
+        itemT += "<span class='icon icon-x file-bookmark-remove' data-path=\"#{file.path}\"></span>"
         itemT += "<span class='fb-filename' data-path=\"#{file.path}\">#{file.name}</span>"
       itemT += "</div>"
       bookmarkList.append itemT
@@ -102,9 +106,20 @@ class FileBookmarkView
     @fbIcons.classList.add 'panel-closed'
     @_showRight()
 
-  updateBookmarkIcon: (bookmarked) ->
+  removeBookmark: (path) ->
+    if path in @bookmarks
+      paths = @bookmarks.filter (item) => item isnt path
+      @setBookmarks paths
+      @redrawBookmarks atom.workspace.getActiveTextEditor().getPath()
+
+  redrawBookmarks: (path) ->
+    @renderItems()
+    @updateBookmarkIcon path
+    @highlightActiveFile path
+
+  updateBookmarkIcon: (path) ->
     @favoriteIcon.classList.remove 'fb-file-bookmarked', 'fb-file-not-bookmarked'
-    if bookmarked
+    if path in @bookmarks
       @favoriteIcon.classList.add 'fb-file-bookmarked'
     else
       @favoriteIcon.classList.add 'fb-file-not-bookmarked'
@@ -127,7 +142,11 @@ class FileBookmarkView
   clearBookmarks: ->
     @bookmarks = []
     @renderItems()
-    @updateBookmarkIcon no
+    @updateBookmarkIcon ''
+
+  highlightActiveFile: (path) ->
+    $(".fb-filename").removeClass 'fb-selected'
+    $("[data-path=\"#{path}\"]").addClass 'fb-selected'
 
   _groupPaths: (paths) ->
     output = {}

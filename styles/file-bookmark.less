@@ -46,6 +46,7 @@
 
   .file-bookmark-list {
     display: block;
+    margin-left: 5px;
 
     .file-bookmark-item {
       display: block;
@@ -67,6 +68,18 @@
 
         &.fb-selected {
           background-color: @background-color-selected;
+        }
+      }
+
+      span.file-bookmark-remove {
+        display: inline;
+        float: left;
+        color: @text-color-error;
+        cursor: pointer;
+
+        &::before {
+          margin-left: 5px;
+          margin-right: 2px;
         }
       }
     }
