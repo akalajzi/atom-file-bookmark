@@ -154,9 +154,15 @@ class FileBookmarkView
       item = @_splitPathnameAndFilename path
       if output[item[0]]?
         output[item[0]].push { name: item[1], path: path }
+        output[item[0]].sort @_sortFilenameCallback
       else
         output[item[0]] = [{ name: item[1], path: path }]
     output
+
+  _sortFilenameCallback: (a, b) ->
+    return 1 if (a.name > b.name)
+    return -1 if (a.name < b.name)
+    return 0
 
   _splitPathnameAndFilename: (path) ->
     split = atom.project.relativizePath path
