@@ -4,6 +4,14 @@
 // for a full listing of what's available.
 @import "ui-variables";
 
+@text-color-added: none;
+.mixin (@file-bookmarked: none) when (iscolor(@file-bookmarked)) {
+  background-color: @file-bookmarked;
+}
+.mixin (@file-bookmarked: none) when not (iscolor(@file-bookmarked)) {
+  background-color: #2BDA77;
+}
+
 .file-bookmark {
   @button-margin-size: 2px;
   @button-border-size: 1px;
@@ -195,7 +203,7 @@
       color: @text-color-subtle;
     }
     .fb-file-bookmarked {
-      color: @text-color-added;
+      .mixin(@text-color-added);
     }
 
   }
