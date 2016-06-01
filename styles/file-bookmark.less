@@ -26,6 +26,13 @@
 @background-color-warning: #ffaa2c;
 @background-color-error: #F44336;
 @background-color-highlight: rgba(255, 255, 255, 0.07);
+@text-color-added: none;
+.mixin (@file-bookmarked: none) when (iscolor(@file-bookmarked)) {
+  background-color: @file-bookmarked;
+}
+.mixin (@file-bookmarked: none) when not (iscolor(@file-bookmarked)) {
+  background-color: #2BDA77;
+}
 
 .file-bookmark {
   @button-margin-size: 2px;
@@ -255,7 +262,7 @@
       color: @text-color-subtle;
     }
     .fb-file-bookmarked {
-      color: @text-color-added;
+      .mixin(@text-color-added);
     }
 
   }
