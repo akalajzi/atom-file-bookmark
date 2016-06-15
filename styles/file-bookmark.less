@@ -4,12 +4,34 @@
 // for a full listing of what's available.
 @import "ui-variables";
 
+@text-color: fade(@syntax-text-color, 80%);
+@text-color-dark: #333;
+@text-color-subtle: #666;
+@text-color-highlight: #FFF;
+@text-color-selected: @text-color-highlight;
+
+@text-color-info: #2196F3;
+@text-color-success: #8BC34A;
+@text-color-warning: #FFCA28;
+@text-color-error: #F44336;
+
+@text-color-ignored: fade(@text-color, 50%);
+@text-color-added: lighten(@text-color-success, 10%);
+@text-color-renamed: lighten(@text-color-info, 10%);
+@text-color-modified: lighten(@text-color-warning, 15%);
+@text-color-removed: @text-color-error;
+
+@background-color-info: #2196F3;
+@background-color-success: #8BC34A;
+@background-color-warning: #ffaa2c;
+@background-color-error: #F44336;
+@background-color-highlight: rgba(255, 255, 255, 0.07);
+
 .file-bookmark {
   @button-margin-size: 2px;
   @button-border-size: 1px;
   background-color: @base-background-color;
   border: 1px solid @base-border-color;
-  color: @text-color;
   display: flex;
   justify-content: flex-start;
 
@@ -38,10 +60,25 @@
     padding: 5px;
   }
 
-  button.fb-clear-all-btn {
-    height: 22px;
-    line-height: 22px;
-    font-size: 10px;
+  button {
+
+    &.fb-clear-all-btn,
+    &.fb-toggle-todo-btn {
+      height: 22px;
+      line-height: 22px;
+      font-size: 10px;
+      width: 65px;
+    }
+  }
+
+  .file-bookmark-buttons {
+    width: 100%;
+
+    button {
+      width: 100%;
+      float: left;
+      margin-bottom: 10px;
+    }
   }
 
   .file-bookmark-list {
@@ -63,12 +100,31 @@
         display: block;
         font-size: 12px;
         padding-left: 10px;
-        color: @text-color-highlight;
         cursor: pointer;
 
         &.fb-selected {
-          background-color: @background-color-selected;
+          color: @text-color-selected;
+          background-color: @background-color-highlight;
         }
+
+        &.status-modified {
+          color: @text-color-modified;
+
+          &.fb-selected {
+            color: @text-color-selected;
+            background-color: @background-color-warning;
+          }
+        }
+
+        &.status-added {
+          color: @text-color-added;
+
+          &.fb-selected {
+            color: @text-color-selected;
+            background-color: @background-color-success;
+          }
+        }
+
       }
 
       span.file-bookmark-remove {
@@ -80,6 +136,10 @@
         &::before {
           margin-left: 5px;
           margin-right: 2px;
+        }
+
+        &.fb-selected {
+          color: @text-color-selected;
         }
       }
     }
@@ -199,14 +259,16 @@
     }
 
   }
-}
 
-.tab .status-bookmarked {
-  color: #41c4eb !important;
-}
+  .fb-todo-header {
+    padding-top: 25px;
+    width: 100%;
+  }
 
-.status-bookmarked {
-  color: #41c4eb !important;
+  .fb-todo-list {
+    margin-left: 5px;
+  }
+
 }
 
 span.fb-icon.icon::before {

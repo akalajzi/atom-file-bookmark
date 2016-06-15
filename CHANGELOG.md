@@ -4,4 +4,10 @@
 
 ## 0.2.0
 * Added remove icons next to files
-* 0.2.1 - sorting of files in folder
+
+## 0.3.1
+* sorting of files in folder
+
+## next release
+* fixed styling on light themes
+* todo list

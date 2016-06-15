@@ -1,4 +1,5 @@
 {CompositeDisposable} = require 'atom'
+FbTodoView = require './todo-view'
 _ = require 'underscore-plus'
 $ = jQuery = require "jquery"
 
@@ -6,6 +7,7 @@ module.exports =
 class FileBookmarkView
 
   bookmarks: null
+  fbTodoView: null
 
   atom.deserializers.add(this)
   @deserialize: ({data}) ->
@@ -24,6 +26,8 @@ class FileBookmarkView
 
     @container = document.createElement 'div'
     @container.classList.add 'file-bookmark-container', 'file-bookmark-260px'
+    @settingsContainer = document.createElement 'div'
+    @settingsContainer.classList.add 'file-bookmark-settings-container', 'file-bookmark-260px', 'hidden'
 
     @fbIcons = document.createElement 'div'
     @fbIcons.classList.add 'file-bookmark-icons', 'panel-open'
@@ -47,22 +51,35 @@ class FileBookmarkView
     @treeToggleIcon.innerHTML = "<span class='fb-tree-toggle fb-icon icon icon-three-bars'></span>"
     @fbIcons.appendChild @treeToggleIcon
 
+    buttonsBar = document.createElement 'div'
+    buttonsBar.classList.add 'file-bookmark-buttons'
+    buttonsBar.innerHTML =
+      """
+        <button class="pull-left btn icon icon-tools settings-button">Settings</button>
+      """
+
     header = document.createElement 'div'
-    header.innerHTML = "Bookmarked files<button class='fb-clear-all-btn pull-right btn btn-primary inline-block-tight'>Clear</button>"
+    header.innerHTML =
+      """
+        Bookmarked files<button class='fb-clear-all-btn pull-right btn btn-primary inline-block-tight'>Clear</button>
+      """
     header.classList.add 'title'
 
     bList = document.createElement 'div'
     bList.classList.add 'file-bookmark-list'
 
     # TODO: notes
-    # qNotes = document.createElement 'div'
-    # qNotes.classList.add 'file-bookmark-notes'
+    fbTodoHeader = document.createElement 'div'
+    fbTodoHeader.classList.add 'fb-todo-header', 'title'
+    fbTodoHeader.innerHTML = "TODOs<button class='fb-toggle-todo-btn pull-right btn btn-primary inline-block-tight'>Toggle</button>"
 
+    @container.appendChild buttonsBar
     @container.appendChild header
     @container.appendChild bList
-    # @container.appendChild qNotes
+    @container.appendChild fbTodoHeader
 
     @element.appendChild @container
+    @element.appendChild @settingsContainer
     @element.appendChild @fbIcons
 
     # TODO: check if is enabled on startup
@@ -106,11 +123,20 @@ class FileBookmarkView
     @fbIcons.classList.add 'panel-closed'
     @_showRight()
 
+  showTodo: =>
+    @fbTodoView = new FbTodoView() unless @fbTodoView?
+    @container.appendChild @fbTodoView.getElement()
+    @fbTodoView.show()
+
+  hideTodo: ->
+    @fbTodoView.hide()
+
   removeBookmark: (path) ->
     if path in @bookmarks
       paths = @bookmarks.filter (item) => item isnt path
       @setBookmarks paths
       @redrawBookmarks atom.workspace.getActiveTextEditor().getPath()
+      # TODO: BUG - move git status redraw to view and apply here
 
   redrawBookmarks: (path) ->
     @renderItems()
@@ -145,8 +171,26 @@ class FileBookmarkView
     @updateBookmarkIcon ''
 
   highlightActiveFile: (path) ->
-    $(".fb-filename").removeClass 'fb-selected'
-    $("[data-path=\"#{path}\"]").addClass 'fb-selected'
+    $(@element).find('.fb-filename').removeClass 'fb-selected'
+    $(@element).find('.file-bookmark-remove').removeClass 'fb-selected'
+    $(@element).find("[data-path=\"#{path}\"]").addClass 'fb-selected'
+
+  updateModifiedPath: (path) ->
+    # find and color
+    fileElement = @_findPathElement path
+    fileElement.addClass 'status-modified'
+
+  updateNewPath: (path) ->
+    # find and color
+    fileElement = @_findPathElement path
+    fileElement.addClass 'status-added'
+
+  clearGitStatus: (path) ->
+    fileElement = @_findPathElement path
+    fileElement.removeClass 'status-modified', 'status-added'
+
+  _findPathElement: (path) ->
+    $(@element).find("[data-path=\"#{path}\"]")
 
   _groupPaths: (paths) ->
     output = {}
@@ -177,9 +221,9 @@ class FileBookmarkView
         return itemPath
 
   _showLeft: ->
-    $('.fb-toggle-show').addClass 'hidden'
-    $('.fb-toggle-hide').removeClass 'hidden'
+    $(@element).find('.fb-toggle-show').addClass 'hidden'
+    $(@element).find('.fb-toggle-hide').removeClass 'hidden'
 
   _showRight: ->
-    $('.fb-toggle-show').removeClass 'hidden'
-    $('.fb-toggle-hide').addClass 'hidden'
+    $(@element).find('.fb-toggle-show').removeClass 'hidden'
+    $(@element).find('.fb-toggle-hide').addClass 'hidden'
