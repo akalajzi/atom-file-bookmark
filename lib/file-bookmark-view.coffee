@@ -196,6 +196,7 @@ class FileBookmarkView
     output = {}
     for path in paths
       item = @_splitPathnameAndFilename path
+      return output unless item?
       if output[item[0]]?
         output[item[0]].push { name: item[1], path: path }
         output[item[0]].sort @_sortFilenameCallback
@@ -210,6 +211,8 @@ class FileBookmarkView
 
   _splitPathnameAndFilename: (path) ->
     split = atom.project.relativizePath path
+    console.error 'Cannot bookmark folders (for now), just files.'
+    return false unless split[1]?
     pathArray = split[1].split('/')
     relativePath = (_.initial pathArray).join('/')
     [relativePath, _.last pathArray]
