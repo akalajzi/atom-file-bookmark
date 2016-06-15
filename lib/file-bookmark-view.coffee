@@ -51,12 +51,12 @@ class FileBookmarkView
     @treeToggleIcon.innerHTML = "<span class='fb-tree-toggle fb-icon icon icon-three-bars'></span>"
     @fbIcons.appendChild @treeToggleIcon
 
-    buttonsBar = document.createElement 'div'
-    buttonsBar.classList.add 'file-bookmark-buttons'
-    buttonsBar.innerHTML =
-      """
-        <button class="pull-left btn icon icon-tools settings-button">Settings</button>
-      """
+    # buttonsBar = document.createElement 'div'
+    # buttonsBar.classList.add 'file-bookmark-buttons'
+    # buttonsBar.innerHTML =
+    #   """
+    #     <button class="pull-left btn icon icon-tools settings-button">Settings</button>
+    #   """
 
     header = document.createElement 'div'
     header.innerHTML =
@@ -69,14 +69,14 @@ class FileBookmarkView
     bList.classList.add 'file-bookmark-list'
 
     # TODO: notes
-    fbTodoHeader = document.createElement 'div'
-    fbTodoHeader.classList.add 'fb-todo-header', 'title'
-    fbTodoHeader.innerHTML = "TODOs<button class='fb-toggle-todo-btn pull-right btn btn-primary inline-block-tight'>Toggle</button>"
+    # fbTodoHeader = document.createElement 'div'
+    # fbTodoHeader.classList.add 'fb-todo-header', 'title'
+    # fbTodoHeader.innerHTML = "TODOs<button class='fb-toggle-todo-btn pull-right btn btn-primary inline-block-tight'>Toggle</button>"
 
-    @container.appendChild buttonsBar
+    # @container.appendChild buttonsBar
     @container.appendChild header
     @container.appendChild bList
-    @container.appendChild fbTodoHeader
+    # @container.appendChild fbTodoHeader
 
     @element.appendChild @container
     @element.appendChild @settingsContainer
@@ -91,8 +91,6 @@ class FileBookmarkView
       atom.workspace.open (self._entryForElement(this))
     $(@element).on 'click', '.fb-clear-all-btn', =>
       @clearBookmarks()
-    $(@element).on 'click', '.file-bookmark-remove', ->
-      self.removeBookmark (self._entryForElement(this))
 
     @renderItems()
 
@@ -130,13 +128,6 @@ class FileBookmarkView
 
   hideTodo: ->
     @fbTodoView.hide()
-
-  removeBookmark: (path) ->
-    if path in @bookmarks
-      paths = @bookmarks.filter (item) => item isnt path
-      @setBookmarks paths
-      @redrawBookmarks atom.workspace.getActiveTextEditor().getPath()
-      # TODO: BUG - move git status redraw to view and apply here
 
   redrawBookmarks: (path) ->
     @renderItems()
@@ -211,8 +202,7 @@ class FileBookmarkView
 
   _splitPathnameAndFilename: (path) ->
     split = atom.project.relativizePath path
-    console.error 'Cannot bookmark folders (for now), just files.'
-    return false unless split[1]?
+    return null unless split[1]? # Cannot bookmark folders (for now), just files.
     pathArray = split[1].split('/')
     relativePath = (_.initial pathArray).join('/')
     [relativePath, _.last pathArray]

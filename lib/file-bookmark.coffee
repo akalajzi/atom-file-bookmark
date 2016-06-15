@@ -1,5 +1,5 @@
 FileBookmarkView = require './file-bookmark-view'
-FbSettingsView = require './settings-view.coffee'
+# FbSettingsView = require './settings-view.coffee'
 {CompositeDisposable} = require 'atom'
 
 fs = require "fs"
@@ -9,11 +9,7 @@ _ = require 'underscore-plus'
 class FileBookmark
 
   # TODO: bookmark forever - make files available in all projects
-  # DONE: check and color git modified files
-  # DONE: auto add modified files
   # TODO: quick settings icon
-  # TODO: pick width of side panel
-  # TODO: add dark and light colors option
 
   config: require('./config.coffee')
 
@@ -49,7 +45,7 @@ class FileBookmark
     @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:remove': => @remove()
     @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:toggle-bookmark': => @toggleBookmark()
     @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:toggle-shortcut-icons': => @toggleShortcutIcons()
-    @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:toggle-todo-list': => @toggleTodoList()
+    # @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:toggle-todo-list': => @toggleTodoList()
     # @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:test': => @testShit()
     # tooltips
     @tooltipDelay = {
@@ -84,7 +80,11 @@ class FileBookmark
 
     $(@fileBookmarkView.element).on 'click', '.bookmark-this', => @toggleBookmark()
     $(@fileBookmarkView.element).on 'click', '.fb-toggle-icon', => @toggle()
-    $(@fileBookmarkView.element).on 'click', '.settings-button', => @toggleSettingsView()
+    # $(@fileBookmarkView.element).on 'click', '.settings-button', => @toggleSettingsView()
+
+    self = this
+    $(@fileBookmarkView.element).on 'click', '.file-bookmark-remove', ->
+      self.remove (self.fileBookmarkView._entryForElement(this))
 
     @fileBookmarkView.hide()
 
@@ -158,12 +158,14 @@ class FileBookmark
       @fileBookmarkView.redrawBookmarks @currentPath
       @_handleGitStatus()
 
-  remove: ->
+  remove: (path=null) =>
     return if @disabled
-    if @_checkIfBookmarked @currentPath
-      paths = @fileBookmarkView.getBookmarks().filter (item) => item isnt @currentPath
+    unless path?
+      path = @currentPath
+    if @_checkIfBookmarked path
+      paths = @fileBookmarkView.getBookmarks().filter (item) => item isnt path
       @fileBookmarkView.setBookmarks paths
-      @fileBookmarkView.redrawBookmarks @currentPath
+      @fileBookmarkView.redrawBookmarks path
       @_handleGitStatus()
 
   _checkIfBookmarked: (path) ->
@@ -202,10 +204,8 @@ class FileBookmark
       $('.file-bookmark-tree-toggle-icon').addClass 'hidden'
 
   _handleGitStatus: =>
-    return no unless atom.config.get 'file-bookmark.git'
+    return unless atom.config.get 'file-bookmark.git'
 
-    # color me pretty
-    # TODO: move to view
     for path in @fileBookmarkView.getBookmarks()
       isModified = isNew = no
       @git.forEach (repo) =>
