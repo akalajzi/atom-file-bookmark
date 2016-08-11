@@ -9,3 +9,4 @@
 # https://atom.io/docs/latest/behind-atom-keymaps-in-depth
 'atom-workspace':
   'cmd-;': 'file-bookmark:toggle-bookmark'
+  'ctrl-cmd-;': 'file-bookmark:toggle-panel'
