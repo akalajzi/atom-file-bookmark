@@ -15,6 +15,13 @@
 * added git status to bookmarked files
 * added option to auto-bookmark modified files (can be turned off in package settings)
 
-## next release
-* fixed styling on light themes
-* todo list
+## 0.4.1
+* added keymap ctrl-cmd-; for toggling
+
+## 0.4.2
+* refactor
+
+## 0.5.0
+* add all git modified files button
+* prepare for atom 2.0 update
+* refactor and clean some code

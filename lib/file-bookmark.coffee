@@ -1,5 +1,4 @@
 FileBookmarkView = require './file-bookmark-view'
-# FbSettingsView = require './settings-view.coffee'
 {CompositeDisposable} = require 'atom'
 
 fs = require "fs"
@@ -8,23 +7,19 @@ _ = require 'underscore-plus'
 
 class FileBookmark
 
-  # TODO: bookmark forever - make files available in all projects
-  # TODO: quick settings icon
-
   config: require('./config.coffee')
 
   show: null
-  todo: null
   currentPath: null
   disabled: null
   git: null
   autoBookmark: null
+  test: null
 
   MSG_ADDED: "File bookmarked"
   MSG_REMOVED: "File removed from bookmarks"
 
   fileBookmarkView: null
-  fbSettingsView: null
   subscriptions: null
 
   activate: (state) ->
@@ -32,10 +27,8 @@ class FileBookmark
       @fileBookmarkView = atom.deserializers.deserialize state.fileBookmarkViewState
     else
       @fileBookmarkView = new FileBookmarkView()
-    @show = @disabled = @todo = no
+    @show = @disabled = no
     @currentPath = @_getCurrentPath()
-
-    @git = atom.project.getRepositories()
 
     @subscriptions = new CompositeDisposable
 
@@ -45,8 +38,7 @@ class FileBookmark
     @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:remove': => @remove()
     @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:toggle-bookmark': => @toggleBookmark()
     @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:toggle-shortcut-icons': => @toggleShortcutIcons()
-    # @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:toggle-todo-list': => @toggleTodoList()
-    # @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:test': => @testShit()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'file-bookmark:load-git-modified-files': => @loadGitModifiedFiles()
     # tooltips
     @tooltipDelay = {
       show: 100
@@ -71,8 +63,23 @@ class FileBookmark
     @subscriptions.add atom.workspace.onDidChangeActivePaneItem => @_handleChangeActivePane()
     @subscriptions.add atom.packages.onDidActivateInitialPackages => @_handleDependencies()
     if atom.config.get 'file-bookmark.git'
-      @_handleGitListener yes
-      @_handleGitStatus()
+      Promise
+        .all(atom.project.getDirectories().map(
+          atom.project.repositoryForDirectory.bind(atom.project)
+        ))
+        .then (repos) =>
+          if repos.length is 0
+            @fileBookmarkView.hideAddGitModifiedButton()
+            return null
+          else
+            @fileBookmarkView.showAddGitModifiedButton()
+            @git = repos
+            @_handleGitListener yes
+            @_handleGitStatus()
+            return repos
+        .catch (e) ->
+          atom.notifications.addError 'Failed to get repositories.', {detail: e, dismissable: true}
+
     @_handleIconsConfig (atom.config.get 'file-bookmark.icons')
     @autoBookmark = atom.config.get 'file-bookmark.auto'
 
@@ -80,7 +87,8 @@ class FileBookmark
 
     $(@fileBookmarkView.element).on 'click', '.bookmark-this', => @toggleBookmark()
     $(@fileBookmarkView.element).on 'click', '.fb-toggle-icon', => @toggle()
-    # $(@fileBookmarkView.element).on 'click', '.settings-button', => @toggleSettingsView()
+    $(@fileBookmarkView.element).on 'click', '.fb-clear-all-btn', => @fileBookmarkView.clearBookmarks()
+    $(@fileBookmarkView.element).on 'click', '.fb-add-all-btn', => @loadGitModifiedFiles()
 
     self = this
     $(@fileBookmarkView.element).on 'click', '.file-bookmark-remove', ->
@@ -105,22 +113,6 @@ class FileBookmark
   toggleShortcutIcons: =>
     showIcons = not atom.config.get 'file-bookmark.icons'
     atom.config.set 'file-bookmark.icons', showIcons
-
-  toggleTodoList: =>
-    if @todo
-      @fileBookmarkView.hideTodo()
-      @todo = no
-    else
-      @fileBookmarkView.showTodo()
-      @todo = yes
-
-  testShit: ->
-    @_handleGitStatus()
-
-  toggleSettingsView: ->
-    # TODO: create when everything else is loaded
-    @fbSettingsView = new FbSettingsView() unless @fbSettingsView?
-    @fbSettingsView.toggleView()
 
   observeConfigChanges: =>
     atom.config.observe 'file-bookmark.icons', value ->
@@ -167,6 +159,17 @@ class FileBookmark
       @fileBookmarkView.setBookmarks paths
       @fileBookmarkView.redrawBookmarks path
       @_handleGitStatus()
+
+  loadGitModifiedFiles: =>
+    return unless atom.config.get 'file-bookmark.git'
+    for repo in @git
+      innerRepo = repo.repo
+      for filePath in Object.keys(innerRepo.getStatus())
+        if innerRepo.isPathModified(filePath) or innerRepo.isPathNew(filePath)
+          # workaround, refactor adding paths
+          @currentPath = innerRepo.getWorkingDirectory() + '/' + filePath
+          @add()
+          @currentPath = @_getCurrentPath()
 
   _checkIfBookmarked: (path) ->
     if path in @fileBookmarkView.getBookmarks()

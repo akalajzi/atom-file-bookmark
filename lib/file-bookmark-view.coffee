@@ -1,5 +1,4 @@
 {CompositeDisposable} = require 'atom'
-FbTodoView = require './todo-view'
 _ = require 'underscore-plus'
 $ = jQuery = require "jquery"
 
@@ -7,7 +6,6 @@ module.exports =
 class FileBookmarkView
 
   bookmarks: null
-  fbTodoView: null
 
   atom.deserializers.add(this)
   @deserialize: ({data}) ->
@@ -51,13 +49,6 @@ class FileBookmarkView
     @treeToggleIcon.innerHTML = "<span class='fb-tree-toggle fb-icon icon icon-three-bars'></span>"
     @fbIcons.appendChild @treeToggleIcon
 
-    # buttonsBar = document.createElement 'div'
-    # buttonsBar.classList.add 'file-bookmark-buttons'
-    # buttonsBar.innerHTML =
-    #   """
-    #     <button class="pull-left btn icon icon-tools settings-button">Settings</button>
-    #   """
-
     header = document.createElement 'div'
     header.innerHTML =
       """
@@ -65,18 +56,22 @@ class FileBookmarkView
       """
     header.classList.add 'title'
 
+    toolbar = document.createElement 'div'
+    toolbar.innerHTML =
+      """
+        <div class='block'>
+          <button class='fb-add-all-btn btn btn-sm icon icon-repo-pull inline-block-tight'>
+            Add all git modified files
+          </button>
+        </div>
+      """
+
     bList = document.createElement 'div'
     bList.classList.add 'file-bookmark-list'
 
-    # TODO: notes
-    # fbTodoHeader = document.createElement 'div'
-    # fbTodoHeader.classList.add 'fb-todo-header', 'title'
-    # fbTodoHeader.innerHTML = "TODOs<button class='fb-toggle-todo-btn pull-right btn btn-primary inline-block-tight'>Toggle</button>"
-
-    # @container.appendChild buttonsBar
     @container.appendChild header
+    @container.appendChild toolbar
     @container.appendChild bList
-    # @container.appendChild fbTodoHeader
 
     @element.appendChild @container
     @element.appendChild @settingsContainer
@@ -89,8 +84,6 @@ class FileBookmarkView
 
     $(@element).on 'click', '.fb-filename', ->
       atom.workspace.open (self._entryForElement(this))
-    $(@element).on 'click', '.fb-clear-all-btn', =>
-      @clearBookmarks()
 
     @renderItems()
 
@@ -121,13 +114,12 @@ class FileBookmarkView
     @fbIcons.classList.add 'panel-closed'
     @_showRight()
 
-  showTodo: =>
-    @fbTodoView = new FbTodoView() unless @fbTodoView?
-    @container.appendChild @fbTodoView.getElement()
-    @fbTodoView.show()
+  showAddGitModifiedButton: ->
+    $('.fb-add-all-btn').removeClass('hidden');
 
-  hideTodo: ->
-    @fbTodoView.hide()
+  hideAddGitModifiedButton: ->
+    $('.fb-add-all-btn').addClass('hidden');
+
 
   redrawBookmarks: (path) ->
     @renderItems()
