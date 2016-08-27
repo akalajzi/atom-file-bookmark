@@ -11,7 +11,7 @@
     "tree view"
   ],
   "author": {
-    "name": "AK",
+    "name": "Ante",
     "email": "akalajzi@gmail.com"
   },
   "repository": "https://github.com/akalajzi/atom-file-bookmark",
@@ -20,7 +20,7 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
-    "jquery": "^2.1.4",
+    "jquery": "^3.1.0",
     "space-pen": "^5.1.1",
     "underscore-plus": "^1.6.6"
   }

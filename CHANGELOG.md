@@ -25,3 +25,9 @@
 * add all git modified files button
 * prepare for atom 2.0 update
 * refactor and clean some code
+
+## 0.5.1
+* random fixes and performance improvement
+
+## 1.0.0
+* fixes, cleanup, dep update, ready for v1 :)
