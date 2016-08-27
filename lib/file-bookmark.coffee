@@ -104,10 +104,7 @@ class FileBookmark
     fileBookmarkViewState: @fileBookmarkView.serialize()
 
   toggle: =>
-    if @show
-      @fileBookmarkView.hide()
-    else
-      @fileBookmarkView.show()
+    if @show then @fileBookmarkView.hide() else @fileBookmarkView.show()
     @show = not @show
 
   toggleShortcutIcons: =>
@@ -136,18 +133,17 @@ class FileBookmark
 
   toggleBookmark: ->
     return if @disabled
-    if @_checkIfBookmarked @currentPath
-      @remove()
-    else
-      @add()
+    if @_checkIfBookmarked @currentPath then @remove() else @add()
 
-  add: ->
+  add: (path=null) ->
     return if @disabled
-    unless @_checkIfBookmarked @currentPath
+    path = @currentPath unless path?
+
+    unless @_checkIfBookmarked path
       paths = @fileBookmarkView.getBookmarks()
-      paths.push @currentPath
+      paths.push path
       @fileBookmarkView.setBookmarks paths
-      @fileBookmarkView.redrawBookmarks @currentPath
+      @fileBookmarkView.redrawBookmarks path
       @_handleGitStatus()
 
   remove: (path=null) =>
@@ -166,16 +162,10 @@ class FileBookmark
       innerRepo = repo.repo
       for filePath in Object.keys(innerRepo.getStatus())
         if innerRepo.isPathModified(filePath) or innerRepo.isPathNew(filePath)
-          # workaround, refactor adding paths
-          @currentPath = innerRepo.getWorkingDirectory() + '/' + filePath
-          @add()
-          @currentPath = @_getCurrentPath()
+          @add innerRepo.getWorkingDirectory() + '/' + filePath
 
   _checkIfBookmarked: (path) ->
-    if path in @fileBookmarkView.getBookmarks()
-      return yes
-    else
-      return no
+    if path in @fileBookmarkView.getBookmarks() then yes else no
 
   _getEditors: -> atom.workspace.getTextEditors()
 
