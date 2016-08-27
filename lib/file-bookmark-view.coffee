@@ -135,7 +135,6 @@ class FileBookmarkView
 
   # Tear down any state and detach
   destroy: ->
-    @detach() if @panel?
     @panel.destroy() if @panel?
     @element.remove()
 
