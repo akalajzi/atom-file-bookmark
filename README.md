@@ -8,4 +8,4 @@ It is also able to quickly load bookmarks from git repository, adding new and mo
 
 ** To suggest a feature/improvement, open an issue on github repo: *** https://github.com/akalajzi/atom-file-bookmark/issues
 
-![file-bookmark screenshot](https://github.com/akalajzi/atom-file-bookmark/blob/master/resources/screenshot.png)
+![file-bookmark screenshot](https://raw.githubusercontent.com/akalajzi/atom-file-bookmark/master/resources/screenshot.png)
