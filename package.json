@@ -1,7 +1,7 @@
 {
   "name": "file-bookmark",
   "main": "./lib/file-bookmark",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Bookmark files in your project for quick access",
   "keywords": [
     "bookmark",
