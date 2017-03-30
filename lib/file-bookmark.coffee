@@ -178,7 +178,8 @@ class FileBookmark
   _handleChangeActivePane: =>
     if @_getActiveEditor()?
       @disabled = no
-      @_showShortcutIcons()
+      if (atom.config.get 'file-bookmark.icons')
+         @_showShortcutIcons()
     else
       # prevent bookmarking
       @disabled = yes
