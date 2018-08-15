@@ -158,6 +158,9 @@ class FileBookmark
 
   loadGitModifiedFiles: =>
     return unless atom.config.get 'file-bookmark.git'
+    unless @git
+      atom.notifications.addInfo 'Atom failed to load git repo properly.', {detail: "Git repo isn't available to File Bookmarks package. Restarting Atom *might* help.", dismissable: true}
+      return
     for repo in @git
       innerRepo = repo.repo
       for filePath in Object.keys(innerRepo.getStatus())
@@ -202,6 +205,7 @@ class FileBookmark
 
     for path in @fileBookmarkView.getBookmarks()
       isModified = isNew = no
+      return unless @git
       @git.forEach (repo) =>
         isModified ||= repo?.isPathModified(path)
         isNew ||= repo?.isPathNew(path)
